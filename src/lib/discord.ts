@@ -1,4 +1,5 @@
-import { getNextToken } from "../config.ts";
+import { config, getNextToken } from "../config.ts";
+import { purgeOldValues } from "../util/purge.ts";
 import { httpBuffer, httpJson } from "./http.ts";
 
 export async function identify(token: string) {
@@ -30,7 +31,22 @@ async function getJsonWITHOUTcaching(token: string, id: string) {
 	return data;
 }
 
-interface preferredUserObject {
+function transformJsonResponse(from: RawUserObject): PreferredUserObject {
+	return {
+		ok: true,
+		avatar: {
+			url: `https://cdn.discordapp.com/avatars/${from.id}/${from.avatar}.${(from.avatar as string).startsWith("a_") ? "gif" : "png"}?size=2048`,
+			isAnimated: (from.avatar as string).startsWith("a_"),
+		},
+		bot: from.bot ?? false,
+		id: from.id,
+		username: from.username,
+		raw: { ...from },
+	}
+}
+
+type RawUserObject = any
+interface PreferredUserObject {
 	ok: true;
 	id: string;
 	username: string;
@@ -45,15 +61,22 @@ interface preferredUserObject {
 	 * if you think you can do it, ill gladly take a pr!
 	 * of course, youll complain, but you wont pr it.
 	 */
-	raw: any;
+	raw: RawUserObject;
 }
-interface fuckedUpUserObject {
+interface FuckedUpUserObject {
 	ok: false;
 	message: string;
 }
+type JsonResponse = PreferredUserObject | FuckedUpUserObject
+
+const jsonCache = {} as Record<string, { response: JsonResponse, at: number }>
+purgeOldValues(jsonCache, config.cacheTTL * 1000)
 export async function getJsonData(
 	id: string,
-): Promise<preferredUserObject | fuckedUpUserObject> {
+): Promise<JsonResponse> {
+	const cacheHit = jsonCache[id]
+	if (cacheHit) return cacheHit.response
+
 	const meow = await getJsonWITHOUTcaching(getNextToken().token, id);
 	if (!meow) {
 		return {
@@ -61,21 +84,22 @@ export async function getJsonData(
 			message: "could not get object from discord",
 		};
 	}
-	return {
-		ok: true,
-		avatar: {
-			url: `https://cdn.discordapp.com/avatars/${meow.id}/${meow.avatar}.${(meow.avatar as string).startsWith("a_") ? "gif" : "png"}?size=2048`,
-			isAnimated: (meow.avatar as string).startsWith("a_"),
-		},
-		bot: meow.bot ?? false,
-		id: meow.id,
-		username: meow.username,
-		raw: { ...meow },
-	};
+
+	jsonCache[id] = {
+		response: transformJsonResponse(meow),
+		at: Date.now()
+	}
+	return transformJsonResponse(meow);
 }
+
+const staticPfpCache = {} as Record<string, { response: Buffer, at: number }>
+purgeOldValues(staticPfpCache, config.cacheTTL * 1000)
 export async function getStillImageData(
 	id: string,
 ): Promise<Buffer | undefined> {
+	const cacheHit = staticPfpCache[id]
+	if (cacheHit) return cacheHit.response
+
 	const meow = await getJsonWITHOUTcaching(getNextToken().token, id);
 	if (!meow) {
 		return;
@@ -91,12 +115,23 @@ export async function getStillImageData(
 	if (!balls.headers.get("content-type")?.startsWith("image/")) {
 		return;
 	}
-	return Buffer.from(await balls.arrayBuffer());
+
+	const buffer = Buffer.from(await balls.arrayBuffer())
+	staticPfpCache[id] = {
+		response: buffer,
+		at: Date.now()
+	}
+	return buffer;
 }
 
+const animatedPfpCache = {} as Record<string, { response: Buffer, at: number }>
+purgeOldValues(animatedPfpCache, config.cacheTTL * 1000)
 export async function getAnimatedImageData(
 	id: string,
 ): Promise<Buffer | undefined> {
+	const cacheHit = animatedPfpCache[id]
+	if (cacheHit) return cacheHit.response
+
 	const meow = await getJsonWITHOUTcaching(getNextToken().token, id);
 	if (!meow) {
 		return;
@@ -114,5 +149,10 @@ export async function getAnimatedImageData(
 	) {
 		return;
 	}
-	return Buffer.from(await ImNotMakingTheSameJokeAgain.arrayBuffer());
+	const buf = Buffer.from(await ImNotMakingTheSameJokeAgain.arrayBuffer());
+	animatedPfpCache[id] = {
+		response: buf,
+		at: Date.now()
+	}
+	return buf;
 }
