@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2026 Amy <amyulated@proton.me>
+// SPDX-FileCopyrightText: 2026 Sunnie <>
+//
+// SPDX-License-Identifier: EUPL-1.2
+
 const purgeHandlers: (() => any)[] = [];
 export function purgeOldValues<T extends { at: number }>(obj: Record<any, T>,
     after: number,

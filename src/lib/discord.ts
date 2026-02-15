@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2026 Amy <amyulated@proton.me>
+// SPDX-FileCopyrightText: 2026 Sunnie <>
+//
+// SPDX-License-Identifier: EUPL-1.2
+
 import { config, getNextToken } from "../config.ts";
 import { purgeOldValues } from "../util/purge.ts";
 import { httpBuffer, httpJson } from "./http.ts";

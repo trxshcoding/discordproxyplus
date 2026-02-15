@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2026 Amy <amyulated@proton.me>
+// SPDX-FileCopyrightText: 2026 Sunnie <>
+//
+// SPDX-License-Identifier: EUPL-1.2
+
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { config, getNextToken } from "./config.ts";

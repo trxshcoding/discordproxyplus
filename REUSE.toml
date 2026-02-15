@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2026 Name <evelyn@willalways.top>
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+## This file is for REUSE compliance. Refer to https://reuse.software/tutorial/ for more information.
+version = 1
+
+#      CC-BY-SA-4.0
+# ----------------------
+
+[[annotations]]
+path = [
+  "README.md"
+]
+SPDX-FileCopyrightText = "Someone <email@icann.org>"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+#      EUPL-1.2
+# ------------------
+[[annotations]]
+path = [
+  ".git*",
+  ".envrc",
+]
+SPDX-FileCopyrightText = "2026 Name <evelyn@willalways.top>"
+SPDX-License-Identifier = "EUPL-1.2"
+
+#      MISC
+# --------------
+
+# Computer generated files
+[[annotations]]
+path = [
+  "flake.lock",
+  "*.json",
+  "*.yaml",
+]
+SPDX-FileCopyrightText = "NONE"
+# As they are uncopyrightable, we just waive them into public domain.
+SPDX-License-Identifier = "CC0-1.0"

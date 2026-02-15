@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Name <evelyn@willalways.top>
+#
+# SPDX-License-Identifier: EUPL-1.2
+
 {
   description = "discordproxyplus: proxies discord information without a token";
 
