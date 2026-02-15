@@ -74,6 +74,8 @@ const server = serve({
 	fetch: app.fetch,
 	port: 8787,
 });
+
+// Handle OS Signals
 process.on("SIGINT", () => {
 	server.close();
 	process.exit(0);
