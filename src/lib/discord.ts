@@ -6,6 +6,7 @@
 import { config, getNextToken } from "../config.ts";
 import { purgeOldValues } from "../util/purge.ts";
 import { httpBuffer, httpJson } from "./http.ts";
+import type {APIUser} from "discord-api-types/v10";
 
 export async function identify(token: string) {
 	const data = await httpJson(`https://discord.com/api/v10/users/@me`, {
@@ -36,7 +37,7 @@ async function getJsonWITHOUTcaching(token: string, id: string) {
 	return data;
 }
 
-function transformJsonResponse(from: RawUserObject): PreferredUserObject {
+function transformJsonResponse(from: APIUser): PreferredUserObject {
 	return {
 		ok: true,
 		avatar: {
@@ -50,7 +51,6 @@ function transformJsonResponse(from: RawUserObject): PreferredUserObject {
 	}
 }
 
-type RawUserObject = any
 interface PreferredUserObject {
 	ok: true;
 	id: string;
@@ -60,13 +60,7 @@ interface PreferredUserObject {
 		isAnimated: boolean;
 	};
 	bot: boolean;
-	/*
-	 *	why is this an any?
-	 *	please refer to https://docs.discord.food/resources/user#user-object
-	 * if you think you can do it, ill gladly take a pr!
-	 * of course, youll complain, but you wont pr it.
-	 */
-	raw: RawUserObject;
+	raw: APIUser;
 }
 interface FuckedUpUserObject {
 	ok: false;
