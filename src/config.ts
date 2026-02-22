@@ -25,6 +25,7 @@ interface tokenIteratorResponse {
   islastone: boolean;
   numberOfTokens: number;
 }
+
 let innercounter = 0;
 export function getNextToken(): tokenIteratorResponse {
   if (innercounter === config.tokens.length) {
