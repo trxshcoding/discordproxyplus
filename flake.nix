@@ -33,6 +33,7 @@
                 nativeBuildInputs = with pkgs; [
                   # TS tooling
                   nodejs_24
+                  pnpm
                   typescript
                   typescript-language-server
 
